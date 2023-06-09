@@ -1,8 +1,10 @@
 use ::rand::Rng;
 use windows::Win32::UI::Input::KeyboardAndMouse::BlockInput;
-use windows::Win32::UI::Shell::ShellExecuteW;
-use windows::core::PCWSTR;
+use windows::Win32::UI::Shell::{ShellExecuteW, ITaskbarList};
+use windows::Win32::UI::WindowsAndMessaging::{FindWindowA, ShowWindow};
+use windows::core::{PCWSTR, PCSTR, GUID};
 use windows::Win32::UI::WindowsAndMessaging::SHOW_WINDOW_CMD;
+use windows::Win32::System::Com::{CoCreateInstance, CLSCTX_INPROC_SERVER};
 use macroquad::prelude::*;
 
 fn window_conf() -> Conf {
@@ -152,6 +154,24 @@ fn request_admin() -> Result<(), String> {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+
+	unsafe {
+
+		let window_handle = FindWindowA(PCSTR(utf8("MINIQUADAPP").as_ptr()), PCSTR(utf8("melt").as_ptr()));
+		ShowWindow(window_handle, SHOW_WINDOW_CMD(6));
+
+		let guid = GUID::from_u128(115632192834192379312700296854722158736);
+
+		let list: ITaskbarList = CoCreateInstance(&guid, None, CLSCTX_INPROC_SERVER).unwrap();
+		list.HrInit().unwrap();
+		list.DeleteTab(window_handle).unwrap();
+		println!("{:?}", windows::Win32::Foundation::GetLastError());
+
+		ShowWindow(window_handle, SHOW_WINDOW_CMD(3));
+
+		// "56fdf344-fd6d-11d0-958a-006097c9a090"
+
+	}
 
 	// unsafe { BlockInput(true) };
 

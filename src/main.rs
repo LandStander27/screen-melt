@@ -165,7 +165,6 @@ async fn main() {
 		let list: ITaskbarList = CoCreateInstance(&guid, None, CLSCTX_INPROC_SERVER).unwrap();
 		list.HrInit().unwrap();
 		list.DeleteTab(window_handle).unwrap();
-		println!("{:?}", windows::Win32::Foundation::GetLastError());
 
 		ShowWindow(window_handle, SHOW_WINDOW_CMD(3));
 

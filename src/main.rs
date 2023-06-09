@@ -148,7 +148,7 @@ fn utf8<T: TryInto<String>>(s: T) -> Vec<u8> {
 fn request_admin() -> Result<(), String> {
 	if !is_elevated::is_elevated() {
 		unsafe {
-			ShellExecuteW(None, PCWSTR(utf16("runas").as_ptr()), PCWSTR(utf16(std::env::current_exe().unwrap().to_str().unwrap()).as_ptr()), None, None, SHOW_WINDOW_CMD(0));
+			ShellExecuteW(None, PCWSTR(utf16("runas").as_ptr()), PCWSTR(utf16(std::env::current_exe().unwrap().to_str().unwrap()).as_ptr()), PCWSTR(utf16(std::env::args().collect::<Vec<String>>()[1..].join(" ")).as_ptr()), None, SHOW_WINDOW_CMD(0));
 			if !is_elevated::is_elevated() {
 				return Err("After".to_string());
 			}
@@ -193,7 +193,8 @@ async fn main() {
 	// unsafe { buffer.set_len(amount as usize); }
 	// let username = String::from_utf8(buffer).unwrap();
 
-	if !cfg!(debug_assertions) {
+	let args: Vec<String> = std::env::args().collect();
+	if args.contains(&"-b".to_string()) {
 		match request_admin() {
 			Ok(_) => {
 				return;

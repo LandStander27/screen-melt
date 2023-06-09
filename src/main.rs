@@ -8,10 +8,17 @@ use windows::Win32::System::Com::{CoCreateInstance, CLSCTX_INPROC_SERVER};
 use macroquad::prelude::*;
 
 fn window_conf() -> Conf {
+
+	let mut empty_icon = macroquad::miniquad::conf::Icon::miniquad_logo();
+	empty_icon.small = [0; 16 * 16 * 4];
+	empty_icon.medium = [0; 32 * 32 * 4];
+	empty_icon.big = [0; 64 * 64 * 4];
+
 	return Conf {
 		window_title: "melt".to_owned(),
 		fullscreen: true,
 		window_resizable: false,
+		icon: Some(empty_icon),
 		..Default::default()
 	};
 }
@@ -105,18 +112,19 @@ impl Window {
 
 		let mut rng = ::rand::thread_rng();
 
-
-		let amount = rng.gen_range(3..6);
-		let x = rng.gen_range(0..self.image.width as u32);
-		let mut width = rng.gen_range(1..4);
-		if width+x >= self.image.width as u32 {
-			width = self.image.width as u32 - x;
-		}
-
-		for x2 in x..x+width {
-			for y in (amount..self.image.height as u32).rev() {
-				let color = self.image.get_pixel(x2, y-amount);
-				self.image.set_pixel(x2, y, color);
+		for _ in 0..rng.gen_range(0..((1.0*get_time()/2.0).ceil() as u32).min(5)) {
+			let amount = rng.gen_range(0..((1.0*get_time()/2.0).ceil() as u32).min(3));
+			let x = rng.gen_range(0..self.image.width as u32);
+			let mut width = rng.gen_range(0..((1.0*get_time()/2.0).ceil() as u32).min(20));
+			if width+x >= self.image.width as u32 {
+				width = self.image.width as u32 - x;
+			}
+	
+			for x2 in x..x+width {
+				for y in (amount..self.image.height as u32).rev() {
+					let color = self.image.get_pixel(x2, y-amount);
+					self.image.set_pixel(x2, y, color);
+				}
 			}
 		}
 
